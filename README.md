@@ -1,2 +1,2 @@
 # BSL
-My personal standard library
+My personal, header-only standard library targeting C++ 17

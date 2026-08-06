@@ -4,6 +4,7 @@
 #include <cstdio>  // fprintf_s, vsprintf_s
 #include <cstring> // memcpy
 #include <ctime>   // std::time, std::tm, localtime_s
+#include <chrono>
 
 #include "integral_types.h"
 #include "memory.h"
@@ -70,10 +71,14 @@ namespace BSL
         }
         }
 
-        // Get the timestamp
-        std::time_t currentTime = std::time(nullptr);
-        std::tm currentLocalTime{};
-        localtime_s(&currentLocalTime, &currentTime);
+        // Get the timestamp with millisecond precision
+		auto now = std::chrono::system_clock::now();
+		auto milliseconds = static_cast<u32>((std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000).count());
+
+        TECHDEBT("This is windows-only. Use localtime_r for POSIX");
+		std::time_t t = std::chrono::system_clock::to_time_t(now);
+		std::tm currentLocalTime{};
+		localtime_s(&currentLocalTime, &t);
 
         int hour = currentLocalTime.tm_hour;
         char AMorPM[3] = "AM"; // Contains "AM" or "PM" including null terminator
@@ -84,10 +89,11 @@ namespace BSL
             memcpy(AMorPM, "PM", 3);
         }
 
-        fprintf_s(stderr, "[%02d:%02d:%02d %s]%s[%s] %s %s\n",
+        fprintf_s(stderr, "[%02d:%02d:%02d:%03d %s]%s[%s] %s %s\n",
             hour,
             currentLocalTime.tm_min,
             currentLocalTime.tm_sec,
+            milliseconds,
             AMorPM,
             logTypeColor,
             logTypeBuffer,

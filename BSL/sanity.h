@@ -16,5 +16,6 @@
 // Utility
 #define UNUSED(x)       (void)x
 #define TODO()          ASSERT_MSG(false, "TODO - Implement")								// Utility assert for when incomplete code is run
+#define TECHDEBT(x)																			// Defines to nothing. Used strictly as documentation
 #define SAFE_DEL(x)     do { if(x != nullptr) { delete x; x = nullptr; } } while(false)		// Utility delete macro for safely deleting a non-array pointer (e.g. checking if null and also setting it to null)
 #define SAFE_DEL_ARR(x) do { if(x != nullptr) { delete[] x; x = nullptr; } } while(false)	// Utility delete macro for safely deleting an array pointer (e.g. checking if null and also setting it to null)

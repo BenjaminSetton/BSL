@@ -83,6 +83,11 @@ namespace BSL
         int hour = currentLocalTime.tm_hour;
         char AMorPM[3] = "AM"; // Contains "AM" or "PM" including null terminator
 
+        if (hour == 0)
+        {
+            // Edge-case for midnight
+            hour = 12;
+        }
         if (hour > 12)
         {
             hour -= 12;

@@ -13,7 +13,7 @@ namespace BSL
     class FileIO
     {
     public:
-        explicit FileIO(const char* filePath)
+        explicit FileIO(const char* filePath, bool binary = false)
         {
             // Create directory if necessary
             std::filesystem::path filePathObj = std::filesystem::path(filePath);
@@ -24,7 +24,9 @@ namespace BSL
                 std::filesystem::create_directories(parentPathObj);
             }
 
-            m_stream.open(filePath, std::ios::out);
+            std::ios::openmode mode = std::ios::out;
+            if (binary) mode |= std::ios::binary;
+            m_stream.open(filePath, mode);
         }
 
         // TODO - Properly implement missing big 5 members

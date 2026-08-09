@@ -15,24 +15,19 @@ namespace BSL
     public:
         explicit FileIO(const char* filePath, bool binary = false)
         {
-            // Create directory if necessary
-            std::filesystem::path filePathObj = std::filesystem::path(filePath);
-            std::filesystem::path parentPathObj = filePathObj.parent_path();
-
-            if (!parentPathObj.empty() && !std::filesystem::exists(parentPathObj))
-            {
-                std::filesystem::create_directories(parentPathObj);
-            }
-
-            std::ios::openmode mode = std::ios::out;
-            if (binary) mode |= std::ios::binary;
-            m_stream.open(filePath, mode);
+            Open(filePath, binary);
         }
 
         // TODO - Properly implement missing big 5 members
-        ~FileIO() { Close(); }
+        ~FileIO()
+        {
+            Close();
+        }
 
-        bool IsOpen() const { return m_stream.is_open(); }
+        bool IsOpen() const
+        {
+            return m_stream.is_open();
+        }
 
         bool Write(const char* data, u32 length)
         {
@@ -63,6 +58,24 @@ namespace BSL
             m_stream.seekg(offset, std::ios::beg);
             m_stream.seekp(offset, std::ios::beg);
             return m_stream.good();
+        }
+
+    private:
+
+        void Open(const char* filePath, bool isBinary)
+        {
+			// Create directory if necessary
+			std::filesystem::path filePathObj = std::filesystem::path(filePath);
+			std::filesystem::path parentPathObj = filePathObj.parent_path();
+
+			if (!parentPathObj.empty() && !std::filesystem::exists(parentPathObj))
+			{
+				std::filesystem::create_directories(parentPathObj);
+			}
+
+			std::ios::openmode mode = std::ios::out;
+			if (isBinary) mode |= std::ios::binary;
+			m_stream.open(filePath, mode);
         }
 
         void Close()

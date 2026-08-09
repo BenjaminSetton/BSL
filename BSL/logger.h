@@ -123,6 +123,10 @@ namespace BSL
 
     inline void LogDebug(const char* format, ...)
     {
+#if defined(BSL_ENABLE_DEBUG_LOG)
         BSL_LOG_FORMAT_CODE(LOG_TYPE::DBG);
+#else
+        UNUSED(format);
+#endif
     }
 }

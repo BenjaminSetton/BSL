@@ -1,10 +1,10 @@
 #pragma once
 
-#include <algorithm>       // std::copy_n
-#include <cstring>         // std::memset, std::memcpy, std::memcmp
-#include <functional>      // std::hash
+#include <algorithm>
+#include <cstring>
+#include <functional>
 #include <initializer_list>
-#include <type_traits>     // std::enable_if, std::is_arithmetic
+#include <type_traits>
 
 #include "integral_types.h"
 
@@ -56,6 +56,8 @@ namespace BSL
             CopyValues(other);
         }
 
+        // Operator overloading: https://en.cppreference.com/cpp/language/operators
+
         VecT& operator=(const VecT& other)
         {
             if (this == &other)
@@ -81,6 +83,36 @@ namespace BSL
         {
             return (std::memcmp(values, other.values, GetSizeBytes()) == 0);
         }
+
+        VecT& operator+=(const VecT& other)
+        {
+            if constexpr (N >= 1) { SetX(GetX() + other.GetX()); }
+            if constexpr (N >= 2) { SetY(GetY() + other.GetY()); }
+            if constexpr (N >= 3) { SetZ(GetZ() + other.GetZ()); }
+            if constexpr (N == 4) { SetW(GetW() + other.GetW()); }
+            return *this;
+        }
+
+        friend VecT operator+(VecT lhs, const VecT& rhs)
+        {
+            lhs += rhs;
+            return lhs;
+        }
+
+		VecT& operator-=(const VecT& other)
+		{
+			if constexpr (N >= 1) { SetX(GetX() - other.GetX()); }
+			if constexpr (N >= 2) { SetY(GetY() - other.GetY()); }
+			if constexpr (N >= 3) { SetZ(GetZ() - other.GetZ()); }
+			if constexpr (N == 4) { SetW(GetW() - other.GetW()); }
+			return *this;
+		}
+
+		friend VecT operator-(VecT lhs, const VecT& rhs)
+		{
+			lhs -= rhs;
+			return lhs;
+		}
 
         template<class = typename std::enable_if<N >= 1>>
         T GetX() const { return values[0]; }

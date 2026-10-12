@@ -46,9 +46,7 @@ inline constexpr i64 I64_MAX = std::numeric_limits<i64>::max();
 
 // The rest of BSL references these types directly. If you define
 // BSL_NO_INTEGRAL_TYPES, you MUST provide your own equivalent typedefs with these exact
-// names at global scope before including any BSL header. These static_asserts catch the
-// missing types early with a clear message instead of letting the compiler produce a
-// cascade of cryptic errors deep inside BSL internals.
+// names at global scope before including any BSL header
 static_assert(sizeof(u8)  == 1, "BSL_NO_INTEGRAL_TYPES: u8  is not defined or is not 8-bit. You must provide your own typedef");
 static_assert(sizeof(u16) == 2, "BSL_NO_INTEGRAL_TYPES: u16 is not defined or is not 16-bit. You must provide your own typedef");
 static_assert(sizeof(u32) == 4, "BSL_NO_INTEGRAL_TYPES: u32 is not defined or is not 32-bit. You must provide your own typedef");

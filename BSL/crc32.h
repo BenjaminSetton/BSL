@@ -10,10 +10,11 @@
 
 namespace BSL
 {
-	typedef u32 CRC32;
+	using CRC32 = u32;
 
 	inline constexpr u32 CRC_TABLE_SIZE = 256;
 	inline constexpr u32 CRC32_POLYNOMIAL = 0xEDB88320u;
+	inline constexpr CRC32 INVALID_CRC = 0;
 
 	// Helper to expand an index_sequence into a brace-enclosed initializer list,
 	// which is the C++17 idiom for populating a constexpr std::array with a
@@ -34,15 +35,21 @@ namespace BSL
 	inline constexpr std::array<u32, CRC_TABLE_SIZE> s_crcTable = MakeCRCTableImpl(std::make_index_sequence<CRC_TABLE_SIZE>{});
 
 	// Internal function to compute CRC32 hash. While this can be called directly, prefer using overrides below which
-	// don't require an explicit length parameter 
+	// don't require an explicit length parameter. This function will NEVER return an INVALID_CRC
 	constexpr CRC32 HashCRC32_Internal(const char* str, u32 length)
 	{
 		u32 c = 0xFFFFFFFFu;
-		for (u32 i = 0; i < length; i++)
+		CRC32 hash = INVALID_CRC;
+		do
 		{
-			c = s_crcTable[(c ^ static_cast<u8>(str[i])) & 0xFFu] ^ (c >> 8);
-		}
-		return c ^ 0xFFFFFFFFu;
+			for (u32 i = 0; i < length; i++)
+			{
+				c = s_crcTable[(c ^ static_cast<u8>(str[i])) & 0xFFu] ^ (c >> 8);
+			}
+			hash = c ^ 0xFFFFFFFFu;
+		} while (hash == INVALID_CRC);
+
+		return hash;
 	}
 
 	// Hash a string literal at compile time

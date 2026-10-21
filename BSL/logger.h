@@ -5,6 +5,7 @@
 #include <cstring> // memcpy
 #include <ctime>   // std::time, std::tm, localtime_s
 #include <chrono>
+#include <functional>
 
 #include "integral_types.h"
 #include "memory.h"
@@ -15,12 +16,19 @@
     va_list va; \
     va_start(va, format); \
     vsprintf_s(s_printBuffer, MAX_BUFFER_SIZE, format, va); \
-    Log_Internal(logType, s_printBuffer); \
+    LogCallbackFn& callbackFn = GetLogCallback(); \
+    callbackFn(logType, s_printBuffer); \
     va_end(va);
 
 namespace BSL
 {
-    enum class LOG_TYPE { DBG, INFO, WARNING, ERR };
+    enum class LOG_TYPE
+    {
+        DBG,
+        INFO,
+        WARNING,
+        ERR
+    };
 
     inline constexpr u64 MAX_BUFFER_SIZE = KB(16);
     inline char s_printBuffer[MAX_BUFFER_SIZE];
@@ -38,7 +46,9 @@ namespace BSL
     inline const char* const LogInfoBuffer    = "INFO";
     inline const char* const LogDebugBuffer   = "DEBUG";
 
-    inline void Log_Internal(LOG_TYPE type, const char* message)
+    using LogCallbackFn = std::function<void(LOG_TYPE type, const char* message)>;
+
+    inline void LogDefault_Internal(LOG_TYPE type, const char* message)
     {
         const char* logTypeColor = nullptr;
         const char* logTypeBuffer = nullptr;
@@ -105,6 +115,18 @@ namespace BSL
             message,
             LogClearColor);
     }
+
+    inline LogCallbackFn& GetLogCallback()
+    {
+        static LogCallbackFn s_logCallback = LogDefault_Internal;
+        return s_logCallback;
+    }
+
+	inline void SetLogCallback(LogCallbackFn callbackFn)
+	{
+		LogCallbackFn& storedCallback = GetLogCallback();
+        storedCallback = callbackFn;
+	}
 
     inline void LogError(const char* format, ...)
     {
